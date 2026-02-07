@@ -1,0 +1,747 @@
+:root {
+    --primary: #6366f1;
+    --primary-light: #818cf8;
+    --primary-glow: rgba(99, 102, 241, 0.4);
+    --secondary: #4f46e5;
+    --bg-body: #0a0f1d;
+    --bg-card: rgba(23, 33, 53, 0.5);
+    /* Leaner glassmorphism */
+    --bg-card-hover: rgba(30, 41, 59, 0.7);
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --danger: #ef4444;
+    --danger-glow: rgba(239, 68, 68, 0.4);
+    --success: #10b981;
+    --success-glow: rgba(16, 185, 129, 0.4);
+    --warning: #f59e0b;
+    --info: #0ea5e9;
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-surface: rgba(255, 255, 255, 0.03);
+    --shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5);
+    --sidebar-width: 280px;
+}
+
+* {
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+body {
+    margin: 0;
+    font-family: 'Outfit', sans-serif;
+    background: radial-gradient(circle at top left, #1e293b, #0f172a);
+    background-attachment: fixed;
+    color: var(--text-main);
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+    /* Prevent body scroll, use inner scroll */
+}
+
+/* --- Sidebar & Layout --- */
+.app-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: filter 0.5s ease;
+}
+
+.app-container.data-locked {
+    pointer-events: none;
+    filter: grayscale(0.4) brightness(0.6);
+    cursor: not-allowed;
+}
+
+.sidebar {
+    width: var(--sidebar-width);
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid var(--glass-border);
+    display: flex;
+    flex-direction: column;
+    padding: 25px;
+    z-index: 10;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.brand-text h1 {
+    margin: 0;
+    font-size: 20px;
+    background: linear-gradient(90deg, #fff, var(--primary-light));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+}
+
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-radius: 16px;
+    /* slightly rounder */
+    cursor: pointer;
+    color: var(--text-muted);
+    font-weight: 500;
+    border: 1px solid transparent;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-item:hover {
+    background: var(--glass-surface);
+    color: #fff;
+    transform: translateX(5px);
+}
+
+.nav-item.active {
+    background: linear-gradient(90deg, rgba(99, 102, 241, 0.15), transparent);
+    color: var(--primary-light);
+    border-left: 3px solid var(--primary);
+    box-shadow: 10px 0 20px -10px var(--primary-glow);
+}
+
+.nav-item i {
+    width: 20px;
+    text-align: center;
+    font-size: 18px;
+}
+
+.nav-footer {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid var(--glass-border);
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+/* --- Main Content Area --- */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.top-bar {
+    padding: 20px 30px;
+    display: flex;
+    justify-content: flex-end;
+    /* Just status on right */
+    align-items: center;
+    gap: 20px;
+    border-bottom: 1px solid var(--glass-border);
+    background: rgba(15, 23, 42, 0.4);
+}
+
+.content-scroll {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+}
+
+/* --- Tabs --- */
+.tab-panel {
+    display: none;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.tab-panel.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.section-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* --- Components & Cards --- */
+.dashboard-grid {
+    display: grid;
+    gap: 25px;
+}
+
+.grid-2 {
+    grid-template-columns: 1fr 1fr;
+}
+
+.grid-1-2 {
+    grid-template-columns: 1fr 320px;
+}
+
+/* Parking specific */
+
+.card {
+    background: var(--bg-card);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 28px;
+    padding: 28px;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow);
+    height: 100%;
+    transition: transform 0.3s ease, background 0.3s ease;
+    background-clip: padding-box;
+}
+
+.card:hover {
+    background: var(--bg-card-hover);
+    transform: translateY(-5px);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.card-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Status Strip */
+.conn-stat {
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 99px;
+    border: 1px solid var(--glass-border);
+}
+
+.indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-muted);
+}
+
+.indicator.online {
+    background: var(--success);
+    box-shadow: 0 0 10px var(--success);
+}
+
+.indicator.offline {
+    background: var(--danger);
+}
+
+/* API Indicator with pulse animation when receiving data */
+#api-indicator.online {
+    animation: apiPulse 2s ease-in-out infinite;
+}
+
+@keyframes apiPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 10px var(--success);
+        opacity: 1;
+    }
+
+    50% {
+        box-shadow: 0 0 20px var(--success), 0 0 30px var(--success);
+        opacity: 0.8;
+    }
+}
+
+/* Clock specific */
+#real-time {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Parking Specific */
+.parking-layout {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+}
+
+/* On smaller screens (tablets), force 2 or 3 columns to avoid squishing */
+@media (max-width: 1200px) {
+    .parking-layout {
+        grid-template-columns: repeat(5, 1fr);
+        /* Try to keep 5 if possible, or maybe let it auto-flow if space is tight */
+    }
+}
+
+/* Mobile fallback */
+@media (max-width: 768px) {
+    .parking-layout {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.slot {
+    aspect-ratio: 3/4;
+    /* Slightly taller/narrower or adjust as needed */
+    border: 2px solid var(--glass-border);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    position: relative;
+}
+
+.slot.occupied {
+    border-color: var(--danger);
+    background: rgba(239, 68, 68, 0.15);
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.1);
+}
+
+.slot.occupied .slot-icon {
+    color: var(--danger);
+    transform: scale(1.1);
+}
+
+.slot.free {
+    border-color: var(--success);
+    background: rgba(16, 185, 129, 0.1);
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.1);
+}
+
+.slot.free .slot-icon {
+    color: var(--success);
+}
+
+.slot-name {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+}
+
+.slot-icon {
+    font-size: 36px;
+    color: var(--text-muted);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.slot-status {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.3);
+    margin-top: 5px;
+}
+
+/* Gate Control */
+.gate-status {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    margin-bottom: 20px;
+}
+
+.gate-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    background: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.btn-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.btn {
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.btn-open {
+    background: var(--success);
+    color: #fff;
+}
+
+.btn-close {
+    background: var(--danger);
+    color: #fff;
+}
+
+.btn:hover {
+    filter: brightness(1.2);
+    transform: translateY(-2px);
+}
+
+/* Environment & Safety */
+.env-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.env-card {
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    border: 1px solid var(--glass-border);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: background 0.6s ease, transform 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.env-card:hover {
+    transform: translateY(-3px);
+}
+
+.env-val {
+    font-size: 32px;
+    font-weight: 700;
+    color: #fff;
+    z-index: 2;
+}
+
+.env-label {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.8);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    z-index: 2;
+    font-weight: 600;
+}
+
+.misc-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    margin-bottom: 15px;
+}
+
+.badge {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.badge-safe {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--success);
+}
+
+.badge-dry {
+    background: rgba(185, 95, 16, 0.2);
+    color: rgb(185, 95, 16);
+}
+
+.badge-wet {
+    background: rgba(19, 16, 185, 0.2);
+    color: rgb(16, 36, 185);
+}
+
+.badge-alert {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--danger);
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+}
+
+/* RFID */
+.rfid-list {
+    max-height: 300px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.rfid-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 12px 15px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.rfid-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--glass-border);
+    padding: 12px;
+    border-radius: 12px;
+    color: #fff;
+    font-family: inherit;
+    margin-bottom: 15px;
+}
+
+.btn-del {
+    border: none;
+    background: none;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.btn-del:hover {
+    color: var(--danger);
+}
+
+/* Loading Screen */
+#loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.98);
+    backdrop-filter: blur(15px);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+#loading-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-text {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+}
+
+@media (max-width: 1000px) {
+    .grid-1-2 {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        width: 80px;
+        padding: 15px;
+    }
+
+    /* Collapsed sidebar for mobile/tablet */
+    .sidebar-header .brand-text,
+    .nav-item span,
+    .nav-footer {
+        display: none;
+    }
+
+    .sidebar-header {
+        justify-content: center;
+    }
+
+    .nav-item {
+        justify-content: center;
+        padding: 15px;
+    }
+}
+
+/* Loading Logo Centered */
+.loader-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.loader {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 4px solid rgba(99, 102, 241, 0.1);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s cubic-bezier(0.55, 0.055, 0.675, 0.19) infinite;
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+    /* Remove previous margin since container handles layout */
+    margin: 0;
+}
+
+.loader-logo {
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+    object-fit: cover;
+    z-index: 2;
+    /* Optional pulse effect for logo */
+    animation: pulseLogo 2s infinite ease-in-out;
+}
+
+@keyframes pulseLogo {
+
+    0%,
+    100% {
+        opacity: 0.8;
+        transform: scale(0.95);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Loader Logo intro zoom animation when loading completes */
+.loader-logo.logo-intro-zoom {
+    animation: introZoom 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes introZoom {
+    0% {
+        transform: scale(1);
+    }
+
+    60% {
+        transform: scale(2);
+    }
+
+    100% {
+        transform: scale(1.75);
+    }
+}
+
+/* Background Glow Effects */
+.bg-glow {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: -1;
+    opacity: 0.15;
+    pointer-events: none;
+    animation: glowFloat 20s infinite alternate ease-in-out;
+}
+
+.bg-glow-1 {
+    width: 400px;
+    height: 400px;
+    background: var(--primary);
+    top: -100px;
+    right: -100px;
+}
+
+.bg-glow-2 {
+    width: 300px;
+    height: 300px;
+    background: var(--info);
+    bottom: -50px;
+    left: 20%;
+    animation-delay: -5s;
+}
+
+.bg-glow-3 {
+    width: 500px;
+    height: 500px;
+    background: var(--secondary);
+    top: 40%;
+    left: -150px;
+    animation-delay: -10s;
+}
+
+@keyframes glowFloat {
+    from {
+        transform: translate(0, 0) scale(1);
+    }
+
+    to {
+        transform: translate(50px, 30px) scale(1.1);
+    }
+}
+
+.parking-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.parking-row {
+    display: grid;
+    gap: 14px;
+}
+
+#row-top {
+    grid-template-columns: repeat(6, 90px);
+}
+
+#row-bottom {
+    grid-template-columns: repeat(4, 90px);
+}
