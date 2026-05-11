@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="id">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="description"
+        content="Dashboard Smart Parking & Environment Monitoring GDA Future Defender 2025. Monitoring Real-time untuk parkir, suhu, kelembaban, dan keamanan.">
+
+    <title>Smart Parking Dashboard | GDA FUTURE DEFENDER 2025</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="icon" href="favicon.png" type="image/png" />
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="loader-container">
+            <div class="loader" id="loading-spinner"></div>
+            <img src="favicon.png" class="loader-logo" alt="Logo">
+        </div>
+        <div class="loading-text" id="loading-title">PROJECT PARKNEX</div>
+        <div class="loading-subtext" id="loading-status" style="color: var(--text-muted)">Initializing System...</div>
+
+        <div id="loading-error-btn" style="display: none; margin-top: 25px;">
+            <button onclick="location.reload()"
+                style="background: #ef4444; color: white; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 700; font-family: 'Outfit'; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 16px; box-shadow: 0 10px 25px -5px rgba(239, 68, 68, 0.5); transition: transform 0.2s;">
+                <i class="fa-solid fa-rotate-right"></i> COBA LAGI
+            </button>
+        </div>
+
+        <div id="loading-quote"
+            style="margin-top: 30px; font-style: italic; color: var(--text-muted); font-size: 14px; text-align: center; max-width: 60%; opacity: 0.8; line-height: 1.5;">
+            "Technology is best when it brings people together."
+        </div>
+    </div>
+
+    <!-- Decorative Background Elements -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    <div class="bg-glow bg-glow-3"></div>
+
+    <!-- Application Wrapper -->
+    <div class="app-container">
+
+        <!-- Left Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <img src="favicon.png" alt="Icon" width="40" height="40" style="border-radius: 8px;">
+                <div class="brand-text">
+                    <h1>PARKNEX</h1>
+                    <div style="font-size: 11px; color: var(--text-muted);">GDA Future Defender 2025</div>
+                </div>
+            </div>
+
+            <div class="nav-menu">
+                <div id="nav-parking" class="nav-item active" onclick="switchTab('tab-parking', this)">
+                    <i class="fa-solid fa-square-parking"></i>
+                    <span>Parking</span>
+                </div>
+                <div id="nav-env" class="nav-item" onclick="switchTab('tab-env', this)">
+                    <i class="fa-solid fa-temperature-half"></i>
+                    <span>Env Data</span>
+                </div>
+            </div>
+
+            <div class="nav-footer">
+                &copy; 2026 Team SMP ABBS SKA
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+
+            <!-- Top Status Bar -->
+            <div class="top-bar">
+                <div class="conn-stat">
+                    <div id="mqtt-indicator" class="indicator offline"></div>
+                    <span id="mqtt-status">Disconnected</span>
+                </div>
+                <div class="conn-stat">
+                    <div id="fire-indicator" class="indicator offline"></div>
+                    <span id="fire-status-text">No Fire</span>
+                </div>
+                <div class="conn-stat">
+                    <i class="fa-solid fa-clock" style="color: var(--primary-light)"></i>
+                    <span id="real-time">--:--:--</span>
+                </div>
+            </div>
+
+            <div class="content-scroll">
+
+                <!-- TAB 1: Parking Availability (Includes Gate & RFID) -->
+                <div id="tab-parking" class="tab-panel active">
+                    <div class="section-title">
+                        <i class="fa-solid fa-square-parking" style="color: var(--primary);"></i>
+                        Parking Availability
+                    </div>
+
+                    <div class="dashboard-grid grid-1-2">
+                        <!-- Main Parking Grid -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Real-time Slots</h2>
+                                <div style="font-size: 13px; color: var(--text-muted)">
+                                    <span style="color: var(--success)">●</span> Available &nbsp;
+                                    <span style="color: var(--danger)">●</span> Occupied
+                                </div>
+                            </div>
+                            <div class="parking-layout" id="parking-grid">
+                                    <div class="parking-row" id="row-top"></div>
+                                    <div class="parking-row" id="row-bottom"></div>
+                            </div>
+                        </div>
+
+                        <!-- Side Column for Controls -->
+                        <div style="display: flex; flex-direction: column; gap: 25px;">
+                            <!-- Gate Control -->
+                            <div class="card">
+                                <div class="card-header">
+                                    <h2><i class="fa-solid fa-door-open"></i> Gate Control</h2>
+                                </div>
+                                <div class="gate-status">
+                                    <div class="gate-icon" id="gate-icon-box">
+                                        <i class="fa-solid fa-lock" id="gate-icon"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 700; font-size: 18px;" id="gate-text">LOCKED</div>
+                                        <div style="font-size: 12px; color: var(--text-muted)">Servo</div>
+                                    </div>
+                                </div>
+                                <div class="btn-group">
+                                    <button class="btn btn-open" onclick="sendGateCmd('OPEN')">
+                                        <i class="fa-solid fa-unlock"></i> OPEN
+                                    </button>
+                                    <button class="btn btn-close" onclick="sendGateCmd('CLOSE')">
+                                        <i class="fa-solid fa-lock"></i> CLOSE
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- RFID Control -->
+                            <div class="card" style="flex: 1;">
+                                <div class="card-header">
+                                    <h2><i class="fa-solid fa-id-card"></i> RFID Access</h2>
+                                    <div
+                                        style="font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
+                                        <span id="current-uids-count">0</span>/<span id="max-uids-count">3</span>
+                                        <button onclick="changeMaxUIDs()"
+                                            style="background: none; border: none; color: var(--primary-light); cursor: pointer; padding: 0; font-size: 14px;"><i
+                                                class="fa-solid fa-gear"></i></button>
+                                    </div>
+                                </div>
+                                <button class="btn btn-open" style="width: 100%; margin-bottom: 0;"
+                                    onclick="startAddProcess()">
+                                    <i class="fa-solid fa-plus"></i> ADD NEW RFID
+                                </button>
+                                <div style="height: 15px;"></div>
+                                <div class="rfid-list" id="rfid-list">
+                                    <!-- Dynamic -->
+                                    <div style="text-align: center; color: var(--text-muted); padding: 20px;">
+                                        Loading...
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: Env Data -->
+                <div id="tab-env" class="tab-panel">
+                    <div class="section-title">
+                        <i class="fa-solid fa-temperature-half" style="color: var(--info);"></i>
+                        Environmental Data
+                    </div>
+
+                    <div class="env-grid">
+                        <div class="env-card" id="temp-card">
+                            <span class="env-label"><i class="fa-solid fa-temperature-three-quarters"></i>
+                                Temperature</span>
+                            <span class="env-val" id="temp-val">--°C</span>
+                            <div class="env-status" id="temp-status-text"
+                                style="font-size: 12px; opacity: 0.8; margin-top: 5px; z-index: 2;">Waiting data...
+                            </div>
+                        </div>
+                        <div class="env-card" id="hum-card">
+                            <span class="env-label"><i class="fa-solid fa-droplet"></i> Humidity</span>
+                            <span class="env-val" id="hum-val">--%</span>
+                            <div class="env-status" id="hum-status-text"
+                                style="font-size: 12px; opacity: 0.8; margin-top: 5px; z-index: 2;">Waiting data...
+                            </div>
+                        </div>
+                        <div class="env-card" id="ldr-card" style="grid-column: span 2;">
+                            <span class="env-label"><i class="fa-solid fa-sun"></i> Light Intensity (LDR)</span>
+                            <div style="display: flex; align-items: center; gap: 20px; margin-top: 10px; z-index: 2;">
+                                <span class="env-val" id="ldr-val">----</span>
+                                <div
+                                    style="flex: 1; height: 12px; background: rgba(255,255,255,0.2); border-radius: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
+                                    <div id="ldr-bar"
+                                        style="height: 100%; background: #fff; width: 0%; transition: width 0.5s ease;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="env-card" id="fire-card" style="grid-column: span 2;">
+                            <div class="card-header">
+                                <h2>Fire Detection System</h2>
+                            </div>
+                            <div class="misc-row">
+                                <div>
+                                    <div style="font-weight: 600;">Sensor Api</div>
+                                    <div style="font-size: 12px; color: var(--text-muted)">Peringatan Setelah Kebakaran
+                                    </div>
+                                </div>
+                                <div id="fire-status" class="badge badge-safe">No Fire</div>
+                            </div>
+                            <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;">
+                                <button class="btn btn-close" style="width: 100%; background: #991b1b;"
+                                    onclick="manualAlert()">
+                                    <i class="fa-solid fa-bell"></i> TEST SENSOR API
+                                </button>
+                                <button id="turn-off-alarm-btn" class="btn btn-open"
+                                    style="width: 100%; background: #059669; display: none;" onclick="turnOffAlarm()">
+                                    <i class="fa-solid fa-bell-slash"></i> MATIKAN ALARM
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MQTT.js client -->
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js" defer></script>
+
+
+    <script src="app.js" defer></script>
+</body>
+
+</html>
